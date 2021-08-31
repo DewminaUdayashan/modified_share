@@ -65,9 +65,8 @@ class DemoAppState extends State<DemoApp> {
                     title: Text('Add image'),
                     onTap: () async {
                       final imagePicker = ImagePicker();
-                      final pickedFile = await imagePicker.getImage(
-                        source: ImageSource.gallery,
-                      );
+                      final pickedFile = await imagePicker.getVideo(
+                          source: ImageSource.gallery);
                       if (pickedFile != null) {
                         setState(() {
                           imagePaths.add(pickedFile.path);

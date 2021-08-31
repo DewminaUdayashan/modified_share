@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.FileProvider;
@@ -54,6 +55,8 @@ class Share {
     }
 
     void share(String text, String subject, String packageName) {
+        Log.d("TAG", "shareFiles: RECEIVED PACKAGE ==========> " + packageName);
+
         if (text == null || text.isEmpty()) {
             throw new IllegalArgumentException("Non-empty text expected");
         }
@@ -74,7 +77,7 @@ class Share {
         if (paths == null || paths.isEmpty()) {
             throw new IllegalArgumentException("Non-empty path expected");
         }
-
+        Log.d("TAG", "shareFiles: RECEIVED PACKAGE ==========> " + packageNameOptional);
         clearShareCacheFolder();
         ArrayList<Uri> fileUris = getUrisForPaths(paths);
 
@@ -83,15 +86,14 @@ class Share {
             share(text, subject, packageNameOptional);
             return;
         } else if (fileUris.size() == 1) {
-
+            shareIntent.setType("*/*");
             shareIntent.setAction(Intent.ACTION_SEND);
             shareIntent.putExtra(Intent.EXTRA_STREAM, fileUris.get(0));
-            shareIntent.setType(
-                    !mimeTypes.isEmpty() && mimeTypes.get(0) != null ? mimeTypes.get(0) : "*/*");
+
         } else {
+            shareIntent.setType("*/*");
             shareIntent.setAction(Intent.ACTION_SEND_MULTIPLE);
             shareIntent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, fileUris);
-            shareIntent.setType(reduceMimeTypes(mimeTypes));
         }
         if (text != null) shareIntent.putExtra(Intent.EXTRA_TEXT, text);
         if (subject != null) shareIntent.putExtra(Intent.EXTRA_SUBJECT, subject);
@@ -142,7 +144,7 @@ class Share {
                                 + "'");
             }
             file = copyToShareCacheFolder(file);
-
+            Log.d("TAG", "getUrisForPaths: " + FileProvider.getUriForFile(getContext(), providerAuthority, file));
             uris.add(FileProvider.getUriForFile(getContext(), providerAuthority, file));
         }
 
